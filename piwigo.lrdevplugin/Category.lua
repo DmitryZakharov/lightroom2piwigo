@@ -20,7 +20,7 @@ Category = Base:new({
     global_rank = SimpleInt:new(),
     id_uppercat = SimpleInt:new(),
     representative_picture_id = SimpleInt:new(),
-    tn_url = "" 
+    tn_url = SimpleString:new() 
   })
 
 
@@ -33,9 +33,19 @@ function Category.convertCategory(node, categories)
   for i = 1, count do
     Category.setValue( node:childAtIndex( i ), cat)
   end
+  for k, v in pairs( node:attributes() ) do
+    Category.setAttr( k, v, cat)
+  end
+
   categories:addCategory(cat)
 --    LrDialogs.message( "#Categories", tostring(#cats), "info" );
 
+end
+function Category.setAttr(k , v, cat)
+  attName = k:gsub("^%l", string.upper)
+  methodSet = "set".. attName
+  methodGet = "get".. attName
+  cat:invokeSetter(methodSet,  v.value)
 end
 
 function Category.setValue(node, cat)
@@ -48,11 +58,11 @@ end
 
 
 function Category:getId()
-  return self.id.value
+  return self.id
 end
 
 function Category:setId(id)
-  self.id.value = id
+  self.id = id
 end
 
 function Category:getStatus()
