@@ -1,27 +1,58 @@
 local LrDialogs = import 'LrDialogs'
+local LrMobdebug = import 'LrMobdebug'
 
-Category = {id = "", status = "", nb_images = 0, total_nb_images = 0, date_last = "", max_date_last = "", nb_categories = 0, url = "", name = "" , comment = "" , uppercats = 0, global_rank = 0, id_uppercat = 0, representative_picture_id = 0, tn_url = "" }
+require 'SimpleString'
+require 'SimpleInt'
+require 'Base'
 
-function Category:new (o)
-  o = o or {}
-  setmetatable(o, self)
-  self.__index = self
-  return o
+Category = Base:new({
+    id = SimpleString:new(),
+    status = SimpleString:new(),
+    nb_images = SimpleInt:new(),
+    total_nb_images = SimpleInt:new(),
+    date_last = SimpleString:new(),
+    max_date_last = SimpleString:new(),
+    nb_categories = SimpleInt:new(),
+    url = SimpleString:new(),
+    name = SimpleString:new(),
+    comment = SimpleString:new(),
+    uppercats = SimpleInt:new(),
+    global_rank = SimpleInt:new(),
+    id_uppercat = SimpleInt:new(),
+    representative_picture_id = SimpleInt:new(),
+    tn_url = "" 
+  })
+
+
+
+function Category.convertCategory(node, categories)
+  LrMobdebug.start()
+  --nothing to do, we already have an empty table there
+  cat = Category:new()
+  local count = node:childCount()
+  for i = 1, count do
+    Category.setValue( node:childAtIndex( i ), cat)
+  end
+  categories:addCategory(cat)
+--    LrDialogs.message( "#Categories", tostring(#cats), "info" );
+
 end
 
-function Category:invokeGetter(method)
-  return self[method](self)
+function Category.setValue(node, cat)
+  nodeName = node:name():gsub("^%l", string.upper)
+  methodSet = "set".. nodeName
+  methodGet = "get".. nodeName
+  cat:invokeSetter(methodSet,  node:text())
+  return cat;
 end
 
-function Category:invokeSetter(method, param)
-  self[method](self, param)
-end
+
 function Category:getId()
-  return self.id
+  return self.id.value
 end
 
 function Category:setId(id)
-  self.id = id
+  self.id.value = id
 end
 
 function Category:getStatus()
